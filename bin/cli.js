@@ -18,6 +18,7 @@ Options:\n\
   -i, --ignored_directories  glob patterns for directories to ignore (default: node_modules/**, .git/**, .hg/**)\n\
   -e, --file_encoding        file encoding to be scanned (default: utf8)\n\
   -l, --line_length_limit    number of max characters a line (default: 1000)\n\
+  --ignore_messages          ignore certain messages (default: null)\n\
 \n\
 Examples:\n\
 \n\
@@ -28,6 +29,8 @@ Examples:\n\
   Some ignored directories and some including files:\n\
 \n\
     fixme -i \'node_modules/**\' -i \'.git/**\' -i \'build/**\' \'src/**/*.js\' \'test/*\' \n\
+\n\
+    fixme --ignore_messages NOTE,OPTIMIZE,HACK,XXX\n\
 ';
 }
 
@@ -71,6 +74,11 @@ if (file_encoding) {
 var line_length_limit = argv.line_length_limit || argv.l;
 if (line_length_limit) {
   options.line_length_limit = line_length_limit;
+}
+
+var ignore_messages = argv.ignore_messages;
+if (ignore_messages) {
+  options.ignore_messages = ignore_messages.split(',');
 }
 
 fixme(options);
