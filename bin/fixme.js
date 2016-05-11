@@ -102,6 +102,9 @@ function fileFilterer (fileInformation) {
  * message. Will also include an author property if one is found on the
  * message.
  *
+ * The resulting messages will exclude types specified in the ignoreMessages
+ * list.
+ *
  * @param   {String} lineString The
  * @param   {Number} lineNumber
  *
