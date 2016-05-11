@@ -48,7 +48,8 @@ var ignoredDirectories  = ['node_modules/**', '.git/**', '.hg/**'],
         label:    ' ☢ BUG',
         colorer:  chalk.white.bgRed
       }
-    };
+    },
+    ignoreMessages      = null;
 
 /**
  * Determines whether or not to let the file through. by ensuring that the
@@ -117,6 +118,10 @@ function retrieveMessagesFromLine (lineString, lineNumber) {
   messages = [];
 
   Object.keys(messageChecks).forEach(function (checkName) {
+    if (ignoreMessages && ignoreMessages.indexOf(checkName) !== -1) {
+      return;
+    }
+
     var matchResults  = lineString.match(messageChecks[checkName].regex),
         checker       = messageChecks[checkName],
         thisMessage;
@@ -345,6 +350,12 @@ function parseUserOptionsAndScan (options) {
 
     if (options.line_length_limit) {
       lineLengthLimit = options.line_length_limit;
+    }
+
+    if (options.ignore_messages &&
+        Array.isArray(options.ignore_messages) &&
+        options.ignore_messages.length) {
+      ignoreMessages = options.ignore_messages.map(function(checkName) { return checkName.toLowerCase(); });
     }
   }
 
