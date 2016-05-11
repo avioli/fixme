@@ -5,42 +5,44 @@
   "author": "John Postlethwait <john.postlethwait@gmail.com>",
   "website": "http://johnpostlethwait.github.io/fixme",
   "contributors": [],
-
-  "keywords": ["notes", "hack", "todo", "fixme", "annotate", "optimize"],
-
+  "keywords": [
+    "notes",
+    "hack",
+    "todo",
+    "fixme",
+    "annotate",
+    "optimize"
+  ],
   "repository": {
     "type": "git",
     "url": "git://github.com/JohnPostlethwait/fixme.git"
   },
-
   "main": "./index.js",
-
   "bin": {
     "fixme": "bin/cli"
   },
-
   "engines": {
     "node": ">= v0.10.26"
   },
-
   "licenses": [
     {
       "name": "MIT",
       "url": "http://opensource.org/licenses/mit-license.php"
     }
   ],
-
   "dependencies": {
-    "byline":       "4.2.0",
-    "chalk":        "0.5.1",
+    "byline": "4.2.0",
+    "chalk": "0.5.1",
     "event-stream": "3.1.7",
     "isbinaryfile": "2.0.2",
-    "minimatch":    "1.0.0",
-    "minimist":     "1.2.0",
-    "readdirp":     "1.1.0"
+    "minimatch": "1.0.0",
+    "minimist": "1.2.0",
+    "readdirp": "1.1.0"
   },
-
   "devDependencies": {
-
+    "snyk": "^1.14.2"
+  },
+  "scripts": {
+    "test": "snyk test"
   }
 }
