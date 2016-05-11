@@ -30,7 +30,7 @@ Examples:\n\
 \n\
     fixme -i \'node_modules/**\' -i \'.git/**\' -i \'build/**\' \'src/**/*.js\' \'test/*\' \n\
 \n\
-    fixme --ignore_messages NOTE,OPTIMIZE,HACK,XXX\n\
+    fixme --ignore_messages NOTE,OPTIMIZE,HACK --ignore_messages XXX\n\
 ';
 }
 
@@ -76,9 +76,20 @@ if (line_length_limit) {
   options.line_length_limit = line_length_limit;
 }
 
+function appendList(input, el) {
+  return input.concat(el)
+}
+
+function getFlatList(input) {
+  if (Array.isArray(input)) {
+    return input.map(getFlatList).reduce(appendList, []);
+  }
+  return input.split(',');
+}
+
 var ignore_messages = argv.ignore_messages;
 if (ignore_messages) {
-  options.ignore_messages = ignore_messages.split(',');
+  options.ignore_messages = getFlatList(ignore_messages);
 }
 
 fixme(options);
