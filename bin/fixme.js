@@ -1,7 +1,6 @@
 'use strict';
 
-var byline        = require('byline'),
-    chalk         = require('chalk'),
+var chalk         = require('chalk'),
     eventStream   = require('event-stream'),
     fs            = require('fs'),
     isBinaryFile  = require('isbinaryfile'),
@@ -267,7 +266,6 @@ function scanAndProcessMessages () {
   stream
     .pipe(eventStream.map(function (fileInformation, callback) {
       var input                 = fs.createReadStream(fileInformation.fullPath, { encoding: fileEncoding }),
-          // lineStream            = byline.createStream(input, { encoding: fileEncoding }),
           fileMessages          = { path: null, total_lines: 0, messages: [] },
           currentFileLineNumber = 1;
 
