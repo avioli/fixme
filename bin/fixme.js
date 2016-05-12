@@ -389,7 +389,7 @@ function parseUserOptionsAndScan (options) {
 
     if (Array.isArray(options.ignore_messages) &&
         options.ignore_messages.length) {
-      ignoreMessages = options.ignore_messages.map(function(checkName) { return checkName.toLowerCase(); });
+      ignoreMessages = options.ignore_messages
     }
   }
 
