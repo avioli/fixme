@@ -88,8 +88,8 @@ function getFlatList(input) {
 }
 
 var ignore_messages = argv.ignore_messages;
-if (ignore_messages) {
-  options.ignore_messages = getFlatList(ignore_messages);
+if (ignore_messages && ignore_messages !== true) {
+  options.ignore_messages = getFlatList(ignore_messages).map(function(input) { return input.toLowerCase(); });
 }
 
 fixme(options);
