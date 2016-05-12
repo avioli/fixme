@@ -113,13 +113,8 @@ function getFinalMessageChecks (messageChecks, ignoreMessages, exitStatusSetters
     return finalMessageChecks;
   }
 
-  if (ignoreMessages === null) {
-    finalMessageChecks = messageChecks;
-    return finalMessageChecks;
-  }
-
   finalMessageChecks = Object.keys(messageChecks).reduce(function(finalSet, checkName) {
-    if (ignoreMessages.indexOf(checkName) === -1) {
+    if (!ignoreMessages || ignoreMessages.indexOf(checkName) === -1) {
       finalSet.messageChecks[checkName] = messageChecks[checkName];
       finalSet.messageExitStatus[checkName] = exitStatusSetters[checkName];
       finalSet.messageNames.push(checkName);
