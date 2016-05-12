@@ -12,7 +12,7 @@ var minimist = require('minimist'),
     fixme    = require('..'),
     pkg      = require('../package');
 
-function help() {
+function help () {
   return '\
 Usage:\n\
 \n\
@@ -87,29 +87,29 @@ if (line_length_limit) {
   options.line_length_limit = line_length_limit;
 }
 
-function appendList(input, el) {
+function appendList (input, el) {
   return input.concat(el);
 }
 
-function getFlatList(input) {
+function getFlatList (input) {
   if (Array.isArray(input)) {
     return input.map(getFlatList).reduce(appendList, []);
   }
   return input === true ? [] : input.split(',');
 }
 
-function getLength(str) {
+function getLength (str) {
   return str.length;
 }
 
 var ignore_messages = argv.ignore_messages;
 if (ignore_messages && ignore_messages !== true) {
-  options.ignore_messages = getFlatList(ignore_messages).filter(getLength).map(function(input) { return input.toLowerCase(); });
+  options.ignore_messages = getFlatList(ignore_messages).filter(getLength).map(function (input) { return input.toLowerCase(); });
 }
 
 var set_exit_status = argv.set_exit_status;
-if (set_exit_status  && set_exit_status !== true) {
-  options.set_exit_status = getFlatList(set_exit_status).filter(getLength).reduce(function(result, input) {
+if (set_exit_status && set_exit_status !== true) {
+  options.set_exit_status = getFlatList(set_exit_status).filter(getLength).reduce(function (result, input) {
     var pairs = input.split('=');
     var name = pairs[0].toLowerCase();
     result[name] = Number((isNaN(pairs[1]) ? 1 : pairs[1]) || 1);
@@ -117,6 +117,6 @@ if (set_exit_status  && set_exit_status !== true) {
   }, {});
 }
 
-fixme(options).then(function(result) {
+fixme(options).then(function (result) {
   process.exitCode = Number(result.exitStatus);
 });

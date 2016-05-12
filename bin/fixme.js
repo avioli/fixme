@@ -14,7 +14,7 @@ var chalk         = require('chalk'),
     readdirp      = require('readdirp');
 
 var LogType = {
-  FILE_INFO: 'FILE_INFO',
+  FILE_INFO:    'FILE_INFO',
   MESSAGE_INFO: 'MESSAGE_INFO'
 };
 
@@ -26,39 +26,39 @@ var ignoredDirectories  = ['node_modules/**', '.git/**', '.hg/**'],
     lineLengthLimit     = 1000,
     messageChecks       = {
       note: {
-        regex:    /[\/\/][\/\*]\s*NOTE\s*(?:\(([^:]*)\))*\s*:?\s*(.*)/i,
-        label:    ' ✐ NOTE',
-        colorer:  chalk.green
+        regex:   /[\/\/][\/\*]\s*NOTE\s*(?:\(([^:]*)\))*\s*:?\s*(.*)/i,
+        label:   ' ✐ NOTE',
+        colorer: chalk.green
       },
       optimize: {
-        regex:    /[\/\/][\/\*]\s*OPTIMIZE\s*(?:\(([^:]*)\))*\s*:?\s*(.*)/i,
-        label:    ' ↻ OPTIMIZE',
-        colorer:  chalk.blue
+        regex:   /[\/\/][\/\*]\s*OPTIMIZE\s*(?:\(([^:]*)\))*\s*:?\s*(.*)/i,
+        label:   ' ↻ OPTIMIZE',
+        colorer: chalk.blue
       },
       todo: {
-        regex:    /[\/\/][\/\*]\s*TODO\s*(?:\(([^:]*)\))*\s*:?\s*(.*)/i,
-        label:    ' ✓ TODO',
-        colorer:  chalk.magenta
+        regex:   /[\/\/][\/\*]\s*TODO\s*(?:\(([^:]*)\))*\s*:?\s*(.*)/i,
+        label:   ' ✓ TODO',
+        colorer: chalk.magenta
       },
       hack: {
-        regex:    /[\/\/][\/\*]\s*HACK\s*(?:\(([^:]*)\))*\s*:?\s*(.*)/i,
-        label:    ' ✄ HACK',
-        colorer:  chalk.yellow
+        regex:   /[\/\/][\/\*]\s*HACK\s*(?:\(([^:]*)\))*\s*:?\s*(.*)/i,
+        label:   ' ✄ HACK',
+        colorer: chalk.yellow
       },
       xxx: {
-        regex:    /[\/\/][\/\*]\s*XXX\s*(?:\(([^:]*)\))*\s*:?\s*(.*)/i,
-        label:    ' ✗ XXX',
-        colorer:  chalk.black.bgYellow
+        regex:   /[\/\/][\/\*]\s*XXX\s*(?:\(([^:]*)\))*\s*:?\s*(.*)/i,
+        label:   ' ✗ XXX',
+        colorer: chalk.black.bgYellow
       },
       fixme: {
-        regex:    /[\/\/][\/\*]\s*FIXME\s*(?:\(([^:]*)\))*\s*:?\s*(.*)/i,
-        label:    ' ☠ FIXME',
-        colorer:  chalk.red
+        regex:   /[\/\/][\/\*]\s*FIXME\s*(?:\(([^:]*)\))*\s*:?\s*(.*)/i,
+        label:   ' ☠ FIXME',
+        colorer: chalk.red
       },
       bug: {
-        regex:    /[\/\/][\/\*]\s*BUG\s*(?:\(([^:]*)\))*\s*:?\s*(.*)/i,
-        label:    ' ☢ BUG',
-        colorer:  chalk.white.bgRed
+        regex:   /[\/\/][\/\*]\s*BUG\s*(?:\(([^:]*)\))*\s*:?\s*(.*)/i,
+        label:   ' ☢ BUG',
+        colorer: chalk.white.bgRed
       }
     },
     ignoreMessages      = null,
@@ -66,7 +66,7 @@ var ignoredDirectories  = ['node_modules/**', '.git/**', '.hg/**'],
     exitStatusSetters   = {
       bug: 70 // NOTE(evo): Since it is the seventh in severity
     },
-    loggerFunc = function(formattedMessage, type, allMessages, currentMessage) {
+    loggerFunc = function (formattedMessage, type, allMessages, currentMessage) {
       console.log(formattedMessage);
     };
 
@@ -128,7 +128,7 @@ function getFinalMessageChecks (messageChecks, ignoreMessages, exitStatusSetters
     return finalMessageChecks;
   }
 
-  finalMessageChecks = Object.keys(messageChecks).reduce(function(finalSet, checkName) {
+  finalMessageChecks = Object.keys(messageChecks).reduce(function (finalSet, checkName) {
     if (!ignoreMessages || ignoreMessages.indexOf(checkName) === -1) {
       finalSet.messageChecks[checkName] = messageChecks[checkName];
       finalSet.messageExitStatus[checkName] = exitStatusSetters[checkName];
@@ -136,9 +136,9 @@ function getFinalMessageChecks (messageChecks, ignoreMessages, exitStatusSetters
     }
     return finalSet;
   }, {
-    messageChecks: {},
+    messageChecks:     {},
     messageExitStatus: {},
-    messageNames: []
+    messageNames:      []
   });
 
   return finalMessageChecks;
@@ -164,14 +164,14 @@ function getFinalMessageChecks (messageChecks, ignoreMessages, exitStatusSetters
  */
 function retrieveMessagesFromLine (lineString, lineNumber, setExitStatus) {
   var messageFormat = {
-    author:       null,
-    message:      null,
-    label:        null,
-    colorer:      null,
-    line_number:  lineNumber,
-    exit_status:  0
-  },
-  messages = [];
+        author:      null,
+        message:     null,
+        label:       null,
+        colorer:     null,
+        line_number: lineNumber,
+        exit_status: 0
+      },
+      messages = [];
 
   var finalMessageChecks = getFinalMessageChecks(messageChecks, ignoreMessages, exitStatusSetters);
   finalMessageChecks.messageNames.forEach(function (checkName) {
@@ -183,7 +183,7 @@ function retrieveMessagesFromLine (lineString, lineNumber, setExitStatus) {
     if (matchResults && matchResults.length) {
       thisMessage = JSON.parse(JSON.stringify(messageFormat)); // Clone the above structure.
 
-      thisMessage.label   = checker.label;
+      thisMessage.label = checker.label;
       thisMessage.colorer = checker.colorer;
 
       if (matchResults[1] && matchResults[1].length) {
@@ -332,7 +332,7 @@ function scanAndProcessMessages (resolve, reject) {
   stream
     .on('warn', console.warn)
     .on('error', console.error)
-    .on('end', function() {
+    .on('end', function () {
       resolve(result);
     });
 
@@ -345,8 +345,8 @@ function scanAndProcessMessages (resolve, reject) {
 
       fileMessages.path = fileInformation.path;
 
-      input.pipe( eventStream.split() )
-        .pipe( eventStream.map( function( fileLineString, cb ){
+      input.pipe(eventStream.split())
+        .pipe(eventStream.map(function (fileLineString, cb) {
           var messages,
               lengthError;
 
@@ -365,10 +365,10 @@ function scanAndProcessMessages (resolve, reject) {
                           lineLengthLimit + '.';
 
             fileMessages.messages.push({
-              message:      lengthError,
-              line_number:  currentFileLineNumber,
-              label:        ' ⚠ SKIPPING CHECK',
-              colorer:      chalk.underline.red
+              message:     lengthError,
+              line_number: currentFileLineNumber,
+              label:       ' ⚠ SKIPPING CHECK',
+              colorer:     chalk.underline.red
             });
           }
 
@@ -438,14 +438,14 @@ function parseUserOptionsAndScan (options) {
     }
 
     if (typeof options.loggerFunc === 'function') {
-      loggerFunc = options.loggerFunc
+      loggerFunc = options.loggerFunc;
     }
   }
 
-  return new Promise(function(resolve, reject) {
+  return new Promise(function (resolve, reject) {
     scanAndProcessMessages(resolve, reject);
   });
 }
-parseUserOptionsAndScan.LogType = LogType
+parseUserOptionsAndScan.LogType = LogType;
 
 module.exports = parseUserOptionsAndScan;

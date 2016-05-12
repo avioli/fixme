@@ -7,7 +7,7 @@ function dummy () {}
 var baseOptions = {
   path: 'test',
   loggerFunc: dummy
-}
+};
 
 test('fixme is a function', function (t) {
   t.equal(typeof fixme, 'function');
@@ -15,7 +15,7 @@ test('fixme is a function', function (t) {
 });
 
 test('fixme accepts options', function (t) {
-  t.doesNotThrow(function() { fixme(baseOptions); });
+  t.doesNotThrow(function () { fixme(baseOptions); });
   t.end();
 });
 
