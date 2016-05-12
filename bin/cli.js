@@ -77,19 +77,23 @@ if (line_length_limit) {
 }
 
 function appendList(input, el) {
-  return input.concat(el)
+  return input.concat(el);
 }
 
 function getFlatList(input) {
   if (Array.isArray(input)) {
     return input.map(getFlatList).reduce(appendList, []);
   }
-  return input.split(',');
+  return input === true ? [] : input.split(',');
+}
+
+function getLength(str) {
+  return str.length;
 }
 
 var ignore_messages = argv.ignore_messages;
 if (ignore_messages && ignore_messages !== true) {
-  options.ignore_messages = getFlatList(ignore_messages).map(function(input) { return input.toLowerCase(); });
+  options.ignore_messages = getFlatList(ignore_messages).filter(getLength).map(function(input) { return input.toLowerCase(); });
 }
 
 fixme(options);
