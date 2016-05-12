@@ -49,7 +49,8 @@ var ignoredDirectories  = ['node_modules/**', '.git/**', '.hg/**'],
         colorer:  chalk.white.bgRed
       }
     },
-    ignoreMessages      = null;
+    ignoreMessages      = null,
+    finalMessageChecks  = null;
 
 /**
  * Determines whether or not to let the file through. by ensuring that the
@@ -94,6 +95,40 @@ function fileFilterer (fileInformation) {
 }
 
 /**
+ * Takes the full map of all messageChecks and a list of names to ignore and
+ * produces a map with the resulting subset of messageChecks, plus a list of
+ * their names for optimisation.
+ *
+ * @param   {Object} the messageChecks map
+ * @param   {Array}  the ignoreMessages list
+ *
+ * @return  {Object} a map with the final message checks and their names
+ */
+function getFinalMessageChecks (messageChecks, ignoreMessages) {
+  if (finalMessageChecks !== null) {
+    return finalMessageChecks;
+  }
+
+  if (ignoreMessages === null) {
+    finalMessageChecks = messageChecks;
+    return finalMessageChecks;
+  }
+
+  finalMessageChecks = Object.keys(messageChecks).reduce(function(finalSet, checkName) {
+    if (ignoreMessages.indexOf(checkName) === -1) {
+      finalSet.messageChecks[checkName] = messageChecks[checkName];
+      finalSet.messageNames.push(checkName);
+    }
+    return finalSet
+  }, {
+    messageChecks: {},
+    messageNames: []
+  });
+
+  return finalMessageChecks;
+}
+
+/**
  * Takes a line of a file and the line number, and returns an array of all of
  * the messages found in that line. Can return multiple messages per line, for
  * example, if a message was annotated with more than one type. EG: FIXME TODO
@@ -120,13 +155,10 @@ function retrieveMessagesFromLine (lineString, lineNumber) {
   },
   messages = [];
 
-  Object.keys(messageChecks).forEach(function (checkName) {
-    if (ignoreMessages && ignoreMessages.indexOf(checkName) !== -1) {
-      return;
-    }
-
-    var matchResults  = lineString.match(messageChecks[checkName].regex),
-        checker       = messageChecks[checkName],
+  var finalMessageChecks = getFinalMessageChecks(messageChecks, ignoreMessages);
+  finalMessageChecks.messageNames.forEach(function (checkName) {
+    var matchResults  = lineString.match(finalMessageChecks.messageChecks[checkName].regex),
+        checker       = finalMessageChecks.messageChecks[checkName],
         thisMessage;
 
     if (matchResults && matchResults.length) {
@@ -355,8 +387,7 @@ function parseUserOptionsAndScan (options) {
       lineLengthLimit = options.line_length_limit;
     }
 
-    if (options.ignore_messages &&
-        Array.isArray(options.ignore_messages) &&
+    if (Array.isArray(options.ignore_messages) &&
         options.ignore_messages.length) {
       ignoreMessages = options.ignore_messages.map(function(checkName) { return checkName.toLowerCase(); });
     }
