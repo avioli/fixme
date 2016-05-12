@@ -43,6 +43,7 @@
     "tape": "^4.5.1"
   },
   "scripts": {
-    "test": "tape && snyk test"
+    "test": "tape && snyk test",
+    "quicktest": "tape"
   }
 }
