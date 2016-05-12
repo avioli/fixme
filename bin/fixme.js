@@ -7,6 +7,12 @@ var chalk         = require('chalk'),
     minimatch     = require('minimatch'),
     readdirp      = require('readdirp');
 
+var LogType = {
+  FILE_INFO: 'FILE_INFO',
+  MESSAGE_INFO: 'MESSAGE_INFO'
+};
+
+// FIXME(evo): move these globally defined variables in scope of scanAndProcessMessages
 var ignoredDirectories  = ['node_modules/**', '.git/**', '.hg/**'],
     filesToScan         = ['**/*.js', 'Makefile', '**/*.sh'],
     scanPath            = process.cwd(),
@@ -53,6 +59,9 @@ var ignoredDirectories  = ['node_modules/**', '.git/**', '.hg/**'],
     finalMessageChecks  = null,
     exitStatusSetters   = {
       bug: 70 // NOTE(evo): Since it is the seventh in severity
+    },
+    loggerFunc = function(formattedMessage, type, allMessages, currentMessage) {
+      console.log(formattedMessage);
     };
 
 /**
@@ -284,15 +293,16 @@ function formatFilePathOutput (filePath, numberOfMessages) {
  * @property  {String}  messagesInfo.path The file path
  * @property  {Array}   messagesInfo.messages All of the message objects for the file.
  * @property  {String}  messagesInfo.total_lines Total number of lines in the file.
+ * @param     {Function} loggerFunc(formattedMessage, type, allMessages, currentMessage)
  */
-function logMessages (messagesInfo) {
+function logMessages (messagesInfo, loggerFunc) {
   if (messagesInfo.messages.length) {
-    console.log(formatFilePathOutput(messagesInfo.path, messagesInfo.messages.length));
+    loggerFunc(formatFilePathOutput(messagesInfo.path, messagesInfo.messages.length), LogType.FILE_INFO, messagesInfo);
 
     messagesInfo.messages.forEach(function (message) {
       var formattedMessage = formatMessageOutput(message, messagesInfo.total_lines);
 
-      console.log(formattedMessage);
+      loggerFunc(formattedMessage, LogType.MESSAGE_INFO, messagesInfo, message);
     });
   }
 }
@@ -363,7 +373,7 @@ function scanAndProcessMessages (resolve, reject) {
       input.on('end', function () {
         fileMessages.total_lines = currentFileLineNumber;
 
-        logMessages(fileMessages);
+        logMessages(fileMessages, loggerFunc);
 
         if (checkExitStatus && fileExitStatus > result.exitStatus) {
           result.exitStatus = fileExitStatus;
@@ -420,11 +430,16 @@ function parseUserOptionsAndScan (options) {
     if (typeof options.set_exit_status !== 'undefined') {
       exitStatusSetters = options.set_exit_status;
     }
+
+    if (typeof options.loggerFunc === 'function') {
+      loggerFunc = options.loggerFunc
+    }
   }
 
   return new Promise(function(resolve, reject) {
     scanAndProcessMessages(resolve, reject);
   });
 }
+parseUserOptionsAndScan.LogType = LogType
 
 module.exports = parseUserOptionsAndScan;
