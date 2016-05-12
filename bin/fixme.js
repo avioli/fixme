@@ -124,7 +124,7 @@ function getFinalMessageChecks (messageChecks, ignoreMessages, exitStatusSetters
       finalSet.messageExitStatus[checkName] = exitStatusSetters[checkName];
       finalSet.messageNames.push(checkName);
     }
-    return finalSet
+    return finalSet;
   }, {
     messageChecks: {},
     messageExitStatus: {},
@@ -185,7 +185,7 @@ function retrieveMessagesFromLine (lineString, lineNumber, setExitStatus) {
       }
 
       if (setExitStatus && exitStatus) {
-        thisMessage.exit_status = exitStatus
+        thisMessage.exit_status = exitStatus;
       }
     }
 
@@ -362,7 +362,7 @@ function scanAndProcessMessages (resolve, reject) {
           }
 
           currentFileLineNumber += 1;
-        })
+        });
       );
 
       input.on('end', function () {
@@ -419,11 +419,11 @@ function parseUserOptionsAndScan (options) {
 
     if (Array.isArray(options.ignore_messages) &&
         options.ignore_messages.length) {
-      ignoreMessages = options.ignore_messages
+      ignoreMessages = options.ignore_messages;
     }
 
     if (typeof options.set_exit_status !== 'undefined') {
-      exitStatusSetters = options.set_exit_status
+      exitStatusSetters = options.set_exit_status;
     }
   }
 
