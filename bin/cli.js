@@ -1,5 +1,13 @@
 'use strict';
 
+/*eslint semi: ["error", "always"]*/
+/*eslint key-spacing: ["error", { align: "value" }]*/
+/*eslint no-multi-spaces: ["error", { exceptions: { "VariableDeclarator": true } }]*/
+/*eslint one-var: 0*/
+/*eslint indent: ["error", 2, { "VariableDeclarator": 2 }]*/
+/*eslint camelcase: 0*/
+/*eslint no-multi-str: 0*/
+
 var minimist = require('minimist'),
     fixme    = require('..'),
     pkg      = require('../package');

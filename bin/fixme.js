@@ -1,5 +1,11 @@
 'use strict';
 
+/*eslint semi: ["error", "always"]*/
+/*eslint key-spacing: ["error", { align: "value" }]*/
+/*eslint no-multi-spaces: ["error", { exceptions: { "VariableDeclarator": true } }]*/
+/*eslint one-var: 0*/
+/*eslint indent: ["error", 2, { "VariableDeclarator": 2 }]*/
+
 var chalk         = require('chalk'),
     eventStream   = require('event-stream'),
     fs            = require('fs'),

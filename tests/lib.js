@@ -1,3 +1,5 @@
+/*eslint semi: ["error", "always"]*/
+
 var test = require('tape');
 var fixme = require('..');
 
