@@ -50,7 +50,10 @@ var ignoredDirectories  = ['node_modules/**', '.git/**', '.hg/**'],
       }
     },
     ignoreMessages      = null,
-    finalMessageChecks  = null;
+    finalMessageChecks  = null,
+    exitStatusSetters   = {
+      bug: 70 // NOTE(evo): Since it is the seventh in severity
+    };
 
 /**
  * Determines whether or not to let the file through. by ensuring that the
@@ -101,10 +104,11 @@ function fileFilterer (fileInformation) {
  *
  * @param   {Object} the messageChecks map
  * @param   {Array}  the ignoreMessages list
+ * @param   {Object} the exitStatusSetters map
  *
  * @return  {Object} a map with the final message checks and their names
  */
-function getFinalMessageChecks (messageChecks, ignoreMessages) {
+function getFinalMessageChecks (messageChecks, ignoreMessages, exitStatusSetters) {
   if (finalMessageChecks !== null) {
     return finalMessageChecks;
   }
@@ -117,11 +121,13 @@ function getFinalMessageChecks (messageChecks, ignoreMessages) {
   finalMessageChecks = Object.keys(messageChecks).reduce(function(finalSet, checkName) {
     if (ignoreMessages.indexOf(checkName) === -1) {
       finalSet.messageChecks[checkName] = messageChecks[checkName];
+      finalSet.messageExitStatus[checkName] = exitStatusSetters[checkName];
       finalSet.messageNames.push(checkName);
     }
     return finalSet
   }, {
     messageChecks: {},
+    messageExitStatus: {},
     messageNames: []
   });
 
@@ -140,25 +146,28 @@ function getFinalMessageChecks (messageChecks, ignoreMessages) {
  * The resulting messages will exclude types specified in the ignoreMessages
  * list.
  *
- * @param   {String} lineString The
- * @param   {Number} lineNumber
+ * @param   {String}  lineString The
+ * @param   {Number}  lineNumber
+ * @param   {Boolean} setExitStatus
  *
  * @return  {Array}
  */
-function retrieveMessagesFromLine (lineString, lineNumber) {
+function retrieveMessagesFromLine (lineString, lineNumber, setExitStatus) {
   var messageFormat = {
     author:       null,
     message:      null,
     label:        null,
     colorer:      null,
-    line_number:  lineNumber
+    line_number:  lineNumber,
+    exit_status:  0
   },
   messages = [];
 
-  var finalMessageChecks = getFinalMessageChecks(messageChecks, ignoreMessages);
+  var finalMessageChecks = getFinalMessageChecks(messageChecks, ignoreMessages, exitStatusSetters);
   finalMessageChecks.messageNames.forEach(function (checkName) {
     var matchResults  = lineString.match(finalMessageChecks.messageChecks[checkName].regex),
         checker       = finalMessageChecks.messageChecks[checkName],
+        exitStatus    = finalMessageChecks.messageExitStatus[checkName],
         thisMessage;
 
     if (matchResults && matchResults.length) {
@@ -173,6 +182,10 @@ function retrieveMessagesFromLine (lineString, lineNumber) {
 
       if (matchResults[2] && matchResults[2].length) {
         thisMessage.message = matchResults[2].trim();
+      }
+
+      if (setExitStatus && exitStatus) {
+        thisMessage.exit_status = exitStatus
       }
     }
 
@@ -292,22 +305,32 @@ function logMessages (messagesInfo) {
 /**
  * Reads through the configured path scans the matching files for messages.
  */
-function scanAndProcessMessages () {
+function scanAndProcessMessages (resolve, reject) {
+  var result = {
+    exitStatus: 0
+  };
+
   var stream = readdirp({
     root:       scanPath,
     fileFilter: fileFilterer
   });
 
+  var checkExitStatus = exitStatusSetters !== null;
+
   // TODO: Actually do something meaningful/useful with these handlers.
   stream
     .on('warn', console.warn)
-    .on('error', console.error);
+    .on('error', console.error)
+    .on('end', function() {
+      resolve(result);
+    });
 
   stream
     .pipe(eventStream.map(function (fileInformation, callback) {
       var input                 = fs.createReadStream(fileInformation.fullPath, { encoding: fileEncoding }),
           fileMessages          = { path: null, total_lines: 0, messages: [] },
-          currentFileLineNumber = 1;
+          currentFileLineNumber = 1,
+          fileExitStatus        = 0;
 
       fileMessages.path = fileInformation.path;
 
@@ -317,9 +340,12 @@ function scanAndProcessMessages () {
               lengthError;
 
           if (fileLineString.length < lineLengthLimit) {
-            messages = retrieveMessagesFromLine(fileLineString, currentFileLineNumber);
+            messages = retrieveMessagesFromLine(fileLineString, currentFileLineNumber, checkExitStatus);
 
             messages.forEach(function (message) {
+              if (checkExitStatus && message.exit_status > fileExitStatus) {
+                fileExitStatus = message.exit_status;
+              }
               fileMessages.messages.push(message);
             });
           } else {
@@ -343,6 +369,10 @@ function scanAndProcessMessages () {
         fileMessages.total_lines = currentFileLineNumber;
 
         logMessages(fileMessages);
+
+        if (checkExitStatus && fileExitStatus > result.exitStatus) {
+          result.exitStatus = fileExitStatus;
+        }
       });
 
       callback();
@@ -391,9 +421,15 @@ function parseUserOptionsAndScan (options) {
         options.ignore_messages.length) {
       ignoreMessages = options.ignore_messages
     }
+
+    if (typeof options.set_exit_status !== 'undefined') {
+      exitStatusSetters = options.set_exit_status
+    }
   }
 
-  scanAndProcessMessages();
+  return new Promise(function(resolve, reject) {
+    scanAndProcessMessages(resolve, reject);
+  });
 }
 
 module.exports = parseUserOptionsAndScan;
