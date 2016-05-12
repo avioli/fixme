@@ -362,7 +362,7 @@ function scanAndProcessMessages (resolve, reject) {
           }
 
           currentFileLineNumber += 1;
-        });
+        })
       );
 
       input.on('end', function () {
