@@ -39,7 +39,11 @@ Examples:\n\
 \n\
     fixme -i \'node_modules/**\' -i \'.git/**\' -i \'build/**\' \'src/**/*.js\' \'test/*\' \n\
 \n\
+  Some ignored message types:\n\
+\n\
     fixme --ignore_messages NOTE,OPTIMIZE,HACK --ignore_messages XXX\n\
+\n\
+  Set the exit status, based on the message type:\n\
 \n\
     fixme --set_exit_status BUG=70,FIXME --set_exit_status TODO=1\n\
 ';
